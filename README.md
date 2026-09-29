@@ -21,6 +21,21 @@ npm run test:e2e   # builds, serves out/, runs the Playwright suite
 `npm run build` produces a fully static site in `out/` — drop it on any static
 host. There are no runtime API calls and no server.
 
+## Deploying to Cloudflare Workers
+
+The site is served as static assets from a Cloudflare Worker (no Worker script).
+`wrangler.jsonc` points the assets directory at `out/` and runs `npm run build`
+itself before uploading, so the connected Cloudflare Git integration only needs
+the default deploy command (`npx wrangler deploy`).
+
+```bash
+npm run cf:preview # build, then serve out/ locally through wrangler
+npm run deploy     # build and deploy manually
+```
+
+The `name` in `wrangler.jsonc` must match the Worker name in the Cloudflare
+dashboard.
+
 ## How the game works
 
 | Difficulty | Words | Blanks per word | Lives |

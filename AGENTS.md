@@ -94,6 +94,7 @@ Add `?seed=<number>` to the URL to fix the word order. The tests use it.
 - `npm run build`: make the static site in `out/`.
 - `npm run lint`: run ESLint.
 - `npm run test:e2e`: build, serve `out/`, and run the Playwright tests.
+- `npm run deploy`: deploy the static site with Wrangler (Cloudflare Worker).
 
 ## Pictures
 

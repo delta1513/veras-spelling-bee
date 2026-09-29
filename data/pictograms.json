@@ -1,0 +1,126 @@
+{
+  "attribution": {
+    "author": "Sergio Palao",
+    "origin": "ARASAAC (http://arasaac.org)",
+    "owner": "Gobierno de Aragon",
+    "license": "CC BY-NC-SA 4.0"
+  },
+  "pictograms": {
+    "apple": {
+      "id": 2462,
+      "keyword": "apple"
+    },
+    "ball": {
+      "id": 3241,
+      "keyword": "ball"
+    },
+    "cat": {
+      "id": 2406,
+      "keyword": "cat"
+    },
+    "dog": {
+      "id": 2517,
+      "keyword": "dog"
+    },
+    "egg": {
+      "id": 2427,
+      "keyword": "egg"
+    },
+    "fish": {
+      "id": 2520,
+      "keyword": "fish"
+    },
+    "girl": {
+      "id": 27509,
+      "keyword": "girl"
+    },
+    "hat": {
+      "id": 2572,
+      "keyword": "hat"
+    },
+    "island": {
+      "id": 2966,
+      "keyword": "island"
+    },
+    "jam": {
+      "id": 2470,
+      "keyword": "jam"
+    },
+    "key": {
+      "id": 8153,
+      "keyword": "key"
+    },
+    "leaf": {
+      "id": 5077,
+      "keyword": "leaf"
+    },
+    "moon": {
+      "id": 2933,
+      "keyword": "moon"
+    },
+    "nose": {
+      "id": 2887,
+      "keyword": "nose"
+    },
+    "orange": {
+      "id": 2483,
+      "keyword": "orange"
+    },
+    "pig": {
+      "id": 2327,
+      "keyword": "pig"
+    },
+    "queen": {
+      "id": 5559,
+      "keyword": "queen"
+    },
+    "rain": {
+      "id": 3123,
+      "keyword": "rain"
+    },
+    "sun": {
+      "id": 2798,
+      "keyword": "sun"
+    },
+    "tree": {
+      "id": 2256,
+      "keyword": "tree"
+    },
+    "umbrella": {
+      "id": 2500,
+      "keyword": "umbrella"
+    },
+    "van": {
+      "id": 21878,
+      "keyword": "van"
+    },
+    "water": {
+      "id": 2248,
+      "keyword": "water"
+    },
+    "xylophone": {
+      "id": 2616,
+      "keyword": "xylophone"
+    },
+    "yogurt": {
+      "id": 2618,
+      "keyword": "yogurt"
+    },
+    "zebra": {
+      "id": 2324,
+      "keyword": "zebra"
+    },
+    "bee": {
+      "id": 2239,
+      "keyword": "bee"
+    },
+    "duck": {
+      "id": 2563,
+      "keyword": "duck"
+    },
+    "frog": {
+      "id": 2543,
+      "keyword": "frog"
+    }
+  }
+}

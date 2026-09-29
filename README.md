@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Vera's Spelling Bee
 
-## Getting Started
+A picture-led spelling game. A pictogram shows what the word means, most of the
+letters are already on screen, and the player taps the missing ones on a
+Wordle-style QWERTY keyboard.
 
-First, run the development server:
+It is built for a player who cannot read prose: there are no sentences,
+instructions, or browser dialogs anywhere in the UI. Every control is an emoji,
+an icon, or a colour, touch targets are large, and the whole board is reachable
+one-handed on a phone.
+
+## Running it
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev        # http://localhost:3000
+npm run build      # static export into out/
+npm run test:e2e   # builds, serves out/, runs the Playwright suite
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`npm run build` produces a fully static site in `out/` — drop it on any static
+host. There are no runtime API calls and no server.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## How the game works
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| Difficulty | Words | Blanks per word | Lives |
+| --- | --- | --- | --- |
+| Easy | 5 | 1 | 5, refilled each word |
+| Medium | 5 | `ceil(0.25 × length)` | 4, refilled each word |
+| Hard | 16 | `ceil(0.5 × length)` | 3 for the whole round |
+| Expert | 26 | every letter but the first | 1 for the whole round |
 
-## Learn More
+The word list has one word per letter of the alphabet. Each round shuffles its
+words into a fresh order, and the hidden letters are picked at random every time
+a word comes up — so the same word is a different puzzle on each encounter and
+has to be spelled rather than recalled as a shape.
 
-To learn more about Next.js, take a look at the following resources:
+Any letter can be hidden, including the first. The one exception is expert,
+which always keeps the first letter as an anchor and hides all the rest.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Adding `?seed=<number>` to the URL fixes the word order, so a round can be
+replayed exactly. The end-to-end tests use it; ordinary play leaves it off.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+A correct letter fills its tile and the arrow moves to the next blank. A wrong
+letter greys that key out for the rest of the word and costs a life. Lives gone
+means a sad-face screen with a restart button; all words done means a trophy.
 
-## Deploy on Vercel
+## Pictograms
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The 26 word images plus the bee are committed under `public/pictograms/` and
+served from this host. `scripts/fetch-pictograms.mjs` records how they were
+selected from the ARASAAC API and can regenerate them, but it is not part of the
+build. `data/pictograms.json` maps each word to its ARASAAC id.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Pictograms are the property of the Government of Aragón and have been created by
+Sergio Palao for ARASAAC (<http://arasaac.org>), which distributes them under
+Creative Commons BY-NC-SA licence.
+
+## Not in this version
+
+Audio. Speaking the letter as it is tapped, and the word on success, is the next
+thing to add.

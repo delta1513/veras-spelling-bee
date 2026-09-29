@@ -99,7 +99,3 @@ Add `?seed=<number>` to the URL to fix the word order. The tests use it.
 ## Pictures
 
 The picture is the full meaning of the word for Vera. Each picture must show one clear object that Vera can name at a glance. It must not contain text. The pictures come from ARASAAC. The license is Creative Commons BY-NC-SA. Keep the credit to ARASAAC in `README.md`.
-
-## Planned work
-
-Audio is not done. The plan is to speak each letter when Vera taps it, and to speak the word when she succeeds. Audio helps Vera. It must never replace a visual cue.

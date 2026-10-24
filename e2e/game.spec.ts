@@ -466,3 +466,33 @@ test("blank selection follows the rules for every word", () => {
   expect(wrongFirstLetter).toEqual([]);
   expect(notVarying).toEqual([]);
 });
+
+test("the lightbulb greys out half the live keys, three times, then stops", async ({
+  page,
+}) => {
+  await start(page, "easy");
+  const word = await currentWord(page);
+  const hint = page.getByTestId("btn-hint");
+  const live = () =>
+    page.locator('[data-testid^="key-"][data-disabled="false"]');
+
+  await expect(live()).toHaveCount(26);
+  for (const expected of [13, 6, 3]) {
+    await hint.click();
+    await expect(live()).toHaveCount(expected);
+    // The answer is never greyed out, and a hint costs no life.
+    await expect(
+      page.getByTestId(`key-${word[(await blankIndices(page))[0]]}`),
+    ).toBeEnabled();
+    expect(await livesLeft(page)).toBe("5");
+  }
+
+  await expect(hint).toBeDisabled();
+  await solveWord(page);
+  await expect(page.getByTestId("overlay-success")).toBeVisible();
+
+  // A new word brings the keys and the hints back.
+  await page.getByTestId("btn-next").click();
+  await expect(live()).toHaveCount(26);
+  await expect(hint).toBeEnabled();
+});

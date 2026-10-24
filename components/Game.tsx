@@ -14,7 +14,11 @@ import Keyboard from "./Keyboard";
 import RoundComplete from "./RoundComplete";
 import SuccessOverlay from "./SuccessOverlay";
 import WordDisplay from "./WordDisplay";
-import { HeartIcon, HomeIcon } from "./icons";
+import { HeartIcon, HomeIcon, LightbulbIcon } from "./icons";
+
+/** How many times the lightbulb can be tapped for each word. */
+const MAX_HINTS = 3;
+const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
 
 type Phase = "playing" | "wordComplete" | "roundComplete" | "gameOver";
 
@@ -24,6 +28,9 @@ interface State {
   wordIndex: number;
   slots: Slot[];
   wrongLetters: string[];
+  /** Keys the lightbulb has greyed out for this word. */
+  hintedLetters: string[];
+  hintsUsed: number;
   lives: number;
   phase: Phase;
 }
@@ -49,6 +56,8 @@ function startRound(difficulty: Difficulty): State {
     wordIndex: 0,
     slots: buildSlots(words[0], difficulty),
     wrongLetters: [],
+    hintedLetters: [],
+    hintsUsed: 0,
     lives: config.lives,
     phase: "playing",
   };
@@ -66,10 +75,11 @@ export default function Game({
   const [shake, setShake] = useState(false);
 
   const word = state.words[state.wordIndex];
-  const wrongLetters = useMemo(
-    () => new Set(state.wrongLetters),
-    [state.wrongLetters],
+  const greyedKeys = useMemo(
+    () => new Set([...state.wrongLetters, ...state.hintedLetters]),
+    [state.wrongLetters, state.hintedLetters],
   );
+  const hintsLeft = MAX_HINTS - state.hintsUsed;
 
   const handlePress = useCallback(
     (letter: string) => {
@@ -115,6 +125,40 @@ export default function Game({
     [state],
   );
 
+  const handleHint = useCallback(() => {
+    setState((previous) => {
+      if (previous.phase !== "playing" || previous.hintsUsed >= MAX_HINTS) {
+        return previous;
+      }
+
+      const taken = new Set([
+        ...previous.wrongLetters,
+        ...previous.hintedLetters,
+      ]);
+      const available = [...ALPHABET].filter((letter) => !taken.has(letter));
+      // Never grey a letter the word still needs, or the hint could trap her.
+      const needed = new Set(
+        previous.slots
+          .filter((slot) => slot.blank && !slot.filled)
+          .map((slot) => slot.letter),
+      );
+      const candidates = available.filter((letter) => !needed.has(letter));
+
+      // Fisher-Yates, then take half of the keys that are still live.
+      for (let i = candidates.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+      }
+      const greyed = candidates.slice(0, Math.ceil(available.length / 2));
+
+      return {
+        ...previous,
+        hintedLetters: [...previous.hintedLetters, ...greyed],
+        hintsUsed: previous.hintsUsed + 1,
+      };
+    });
+  }, []);
+
   const handleNext = useCallback(() => {
     setState((previous) => {
       const nextIndex = previous.wordIndex + 1;
@@ -126,6 +170,8 @@ export default function Game({
         wordIndex: nextIndex,
         slots: buildSlots(previous.words[nextIndex], difficulty),
         wrongLetters: [],
+        hintedLetters: [],
+        hintsUsed: 0,
         // Easy and medium hand back a full set of lives for every new word;
         // hard and expert spend one pool across the whole round.
         lives: config.livesScope === "word" ? config.lives : previous.lives,
@@ -149,6 +195,33 @@ export default function Game({
           className="flex h-12 w-12 items-center justify-center rounded-full bg-white shadow-sm active:translate-y-0.5 roomy:h-16 roomy:w-16"
         >
           <HomeIcon className="h-7 w-7 roomy:h-10 roomy:w-10" />
+        </button>
+
+        <button
+          type="button"
+          data-testid="btn-hint"
+          data-hints-left={hintsLeft}
+          aria-label="hint"
+          disabled={hintsLeft <= 0 || state.phase !== "playing"}
+          onClick={handleHint}
+          className="flex h-14 w-20 flex-col items-center justify-center gap-0.5 rounded-full bg-white shadow-sm active:translate-y-0.5 disabled:opacity-60 roomy:h-20 roomy:w-28"
+        >
+          <LightbulbIcon
+            lit={hintsLeft > 0}
+            className="h-8 w-8 roomy:h-11 roomy:w-11"
+          />
+          <span className="flex gap-1" aria-hidden="true">
+            {Array.from({ length: MAX_HINTS }, (_, index) => (
+              <span
+                key={index}
+                className={`h-2 w-2 rounded-full roomy:h-3 roomy:w-3 ${
+                  index < hintsLeft
+                    ? "bg-[color:var(--color-honey-deep)]"
+                    : "bg-black/15"
+                }`}
+              />
+            ))}
+          </span>
         </button>
 
         <div
@@ -211,7 +284,7 @@ export default function Game({
       </div>
 
       <Keyboard
-        disabled={wrongLetters}
+        disabled={greyedKeys}
         onPress={handlePress}
         locked={state.phase !== "playing"}
       />

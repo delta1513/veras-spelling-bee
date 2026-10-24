@@ -166,3 +166,38 @@ export function TrophyIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+/** Lightbulb: "help me". Greys out once the hints are spent. */
+export function LightbulbIcon({
+  lit,
+  className,
+}: IconProps & { lit: boolean }) {
+  const stroke = lit ? "#9c6b08" : "#a39b90";
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path
+        d="M12 2.5a6.5 6.5 0 0 0-3.8 11.8c.7.6 1.1 1.3 1.1 2.2v.5h5.4v-.5c0-.9.4-1.6 1.1-2.2A6.5 6.5 0 0 0 12 2.5Z"
+        fill={lit ? "#ffd45e" : "#d9d3ca"}
+        stroke={stroke}
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.6 19.2h4.8M10.4 21.4h3.2"
+        fill="none"
+        stroke={stroke}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      {lit && (
+        <path
+          d="M12 .4v1M3.6 3.4l.7.7M20.4 3.4l-.7.7M1.4 10h1M21.6 10h1"
+          fill="none"
+          stroke="#f2a20c"
+          strokeWidth="1.4"
+          strokeLinecap="round"
+        />
+      )}
+    </svg>
+  );
+}

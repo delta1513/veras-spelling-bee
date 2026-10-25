@@ -47,6 +47,14 @@ const EASY_WORDS = [
   "jam",
   "pig",
   "van",
+  "bed",
+  "bus",
+  "car",
+  "cow",
+  "fox",
+  "pen",
+  "ear",
+  "eye",
 ] as const;
 const MEDIUM_WORDS = [
   "ball",

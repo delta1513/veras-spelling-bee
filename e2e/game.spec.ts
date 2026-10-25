@@ -335,8 +335,10 @@ test("every word in the set has a pictogram file", () => {
   const files = new Set(
     readdirSync(join(process.cwd(), "public", "pictograms")),
   );
-  for (const word of DIFFICULTIES.expert.words) {
-    expect(files).toContain(`${word}.png`);
+  for (const difficulty of Object.values(DIFFICULTIES)) {
+    for (const word of difficulty.words) {
+      expect(files).toContain(`${word}.png`);
+    }
   }
   expect(files).toContain("bee.png");
 });

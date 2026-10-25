@@ -45,6 +45,14 @@ const PICTOGRAMS = {
   bee: 2239,
   duck: 2563,
   frog: 2543,
+  bed: 2304,
+  bus: 2262,
+  car: 2339,
+  cow: 2609,
+  fox: 2623,
+  pen: 2282,
+  ear: 2871,
+  eye: 6573,
 };
 
 const ATTRIBUTION = {

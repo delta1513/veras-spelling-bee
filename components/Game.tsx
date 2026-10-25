@@ -197,33 +197,6 @@ export default function Game({
           <HomeIcon className="h-7 w-7 roomy:h-10 roomy:w-10" />
         </button>
 
-        <button
-          type="button"
-          data-testid="btn-hint"
-          data-hints-left={hintsLeft}
-          aria-label="hint"
-          disabled={hintsLeft <= 0 || state.phase !== "playing"}
-          onClick={handleHint}
-          className="flex h-14 w-20 flex-col items-center justify-center gap-0.5 rounded-full bg-white shadow-sm active:translate-y-0.5 disabled:opacity-60 roomy:h-20 roomy:w-28"
-        >
-          <LightbulbIcon
-            lit={hintsLeft > 0}
-            className="h-8 w-8 roomy:h-11 roomy:w-11"
-          />
-          <span className="flex gap-1" aria-hidden="true">
-            {Array.from({ length: MAX_HINTS }, (_, index) => (
-              <span
-                key={index}
-                className={`h-2 w-2 rounded-full roomy:h-3 roomy:w-3 ${
-                  index < hintsLeft
-                    ? "bg-[color:var(--color-honey-deep)]"
-                    : "bg-black/15"
-                }`}
-              />
-            ))}
-          </span>
-        </button>
-
         <div
           className="flex gap-1 roomy:gap-2"
           data-testid="lives"
@@ -266,16 +239,48 @@ export default function Game({
         {/* Pictograms have mixed backgrounds, so each sits on its own white card.
             Landscape keeps the picture a little smaller than portrait: there is
             plenty of width there but much less height to share with the keyboard. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          key={word}
-          src={`/pictograms/${word}.png`}
-          alt={word}
-          width={220}
-          height={220}
-          data-testid="word-image"
-          className="h-48 w-48 rounded-3xl bg-white object-contain p-2 shadow-sm roomy:h-60 roomy:w-60 spacious:h-44 spacious:w-44"
-        />
+        {/* Picture stays centred; the hint sits in the free space on its right. */}
+        <div className="grid w-full grid-cols-[1fr_auto_1fr] items-center">
+          <span />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            key={word}
+            src={`/pictograms/${word}.png`}
+            alt={word}
+            width={220}
+            height={220}
+            data-testid="word-image"
+            className="h-48 w-48 rounded-3xl bg-white object-contain p-2 shadow-sm roomy:h-60 roomy:w-60 spacious:h-44 spacious:w-44"
+          />
+          <div className="flex justify-center">
+            <button
+              type="button"
+              data-testid="btn-hint"
+              data-hints-left={hintsLeft}
+              aria-label="hint"
+              disabled={hintsLeft <= 0 || state.phase !== "playing"}
+              onClick={handleHint}
+              className="flex h-24 w-16 flex-col items-center justify-center gap-1.5 rounded-full bg-white shadow-sm active:translate-y-0.5 disabled:opacity-60 roomy:h-36 roomy:w-24 spacious:h-28"
+            >
+              <LightbulbIcon
+                lit={hintsLeft > 0}
+                className="h-10 w-10 roomy:h-16 roomy:w-16"
+              />
+              <span className="flex gap-1" aria-hidden="true">
+                {Array.from({ length: MAX_HINTS }, (_, index) => (
+                  <span
+                    key={index}
+                    className={`h-2 w-2 rounded-full roomy:h-3 roomy:w-3 ${
+                      index < hintsLeft
+                        ? "bg-[color:var(--color-honey-deep)]"
+                        : "bg-black/15"
+                    }`}
+                  />
+                ))}
+              </span>
+            </button>
+          </div>
+        </div>
 
         <WordDisplay
           slots={state.slots}

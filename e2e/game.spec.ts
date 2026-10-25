@@ -498,3 +498,99 @@ test("the lightbulb greys out half the live keys, three times, then stops", asyn
   await expect(live()).toHaveCount(26);
   await expect(hint).toBeEnabled();
 });
+
+test("the speaker says the needed letter in Karen's voice, slowly, and shows it is talking", async ({
+  page,
+}) => {
+  // Headless browsers have no real voices, so stand in a speech engine that
+  // records what it was asked to say and finishes when the test tells it to.
+  await page.addInitScript(() => {
+    type Spoken = { text: string; voice?: string; rate: number; pitch: number };
+    const w = window as unknown as {
+      spoken: Spoken[];
+      finishSpeaking: () => void;
+    };
+    w.spoken = [];
+    let current: SpeechSynthesisUtterance | null = null;
+    const voices = [
+      { name: "Samantha", lang: "en-US" },
+      { name: "Karen", lang: "en-AU" },
+    ];
+    // The real utterance only accepts real voices, so stand that in too.
+    class FakeUtterance {
+      text: string;
+      voice: { name: string } | null = null;
+      lang = "";
+      rate = 1;
+      pitch = 1;
+      onend: ((event: Event) => void) | null = null;
+      onerror: ((event: Event) => void) | null = null;
+      constructor(text: string) {
+        this.text = text;
+      }
+    }
+    Object.defineProperty(window, "SpeechSynthesisUtterance", {
+      configurable: true,
+      value: FakeUtterance,
+    });
+    Object.defineProperty(window, "speechSynthesis", {
+      configurable: true,
+      value: {
+        getVoices: () => voices,
+        cancel: () => {
+          current = null;
+        },
+        speak: (utterance: SpeechSynthesisUtterance) => {
+          current = utterance;
+          w.spoken.push({
+            text: utterance.text,
+            voice: utterance.voice?.name,
+            rate: utterance.rate,
+            pitch: utterance.pitch,
+          });
+        },
+      },
+    });
+    w.finishSpeaking = () => {
+      current?.onend?.(new Event("end") as SpeechSynthesisEvent);
+      current = null;
+    };
+  });
+
+  await start(page, "easy");
+  const word = await currentWord(page);
+  const blank = (await blankIndices(page))[0];
+  const speaker = page.getByTestId("btn-speak");
+
+  await expect(speaker).toBeEnabled();
+  await expect(speaker).toHaveAttribute("data-speaking", "false");
+  await speaker.click();
+
+  expect(
+    await page.evaluate(
+      () => (window as unknown as { spoken: unknown[] }).spoken,
+    ),
+  ).toEqual([
+    { text: word[blank].toUpperCase(), voice: "Karen", rate: 0.5, pitch: 1 },
+  ]);
+  await expect(speaker).toHaveAttribute("data-speaking", "true");
+  await expect(page.getByTestId(`tile-${blank}`)).toHaveAttribute(
+    "data-speaking",
+    "true",
+  );
+
+  await page.evaluate(() =>
+    (window as unknown as { finishSpeaking: () => void }).finishSpeaking(),
+  );
+  await expect(speaker).toHaveAttribute("data-speaking", "false");
+  await expect(page.getByTestId(`tile-${blank}`)).toHaveAttribute(
+    "data-speaking",
+    "false",
+  );
+
+  // Speaking is free: no life lost, and the word can still be finished.
+  expect(await livesLeft(page)).toBe("5");
+  await solveWord(page);
+  await expect(page.getByTestId("overlay-success")).toBeVisible();
+  await expect(speaker).toBeDisabled();
+});

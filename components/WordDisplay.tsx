@@ -30,9 +30,12 @@ function tileSize(length: number) {
 export default function WordDisplay({
   slots,
   shake,
+  speaking = false,
 }: {
   slots: Slot[];
   shake: boolean;
+  /** The letter for the arrowed tile is being read aloud. */
+  speaking?: boolean;
 }) {
   const cursor = cursorIndex(slots);
   const { width, box } = tileSize(slots.length);
@@ -69,15 +72,18 @@ export default function WordDisplay({
               data-testid={`tile-${index}`}
               data-blank={slot.blank ? "true" : "false"}
               data-filled={hidden ? "false" : "true"}
+              data-speaking={speaking && index === cursor ? "true" : "false"}
               className={[
                 "flex items-center justify-center rounded-xl font-black uppercase",
                 width,
                 box,
-                hidden
-                  ? "border-4 border-dashed border-[color:var(--color-honey-deep)] bg-white"
-                  : justFilled
-                    ? "animate-pop bg-[color:var(--color-go)] text-white"
-                    : "bg-white text-[color:var(--color-ink)] shadow-sm",
+                hidden && speaking && index === cursor
+                  ? "animate-talk border-4 border-dashed border-[#4aa3df] bg-[#e6f3fc]"
+                  : hidden
+                    ? "border-4 border-dashed border-[color:var(--color-honey-deep)] bg-white"
+                    : justFilled
+                      ? "animate-pop bg-[color:var(--color-go)] text-white"
+                      : "bg-white text-[color:var(--color-ink)] shadow-sm",
               ].join(" ")}
             >
               {hidden ? "" : slot.letter}

@@ -167,6 +167,50 @@ export function TrophyIcon({ className }: IconProps) {
   );
 }
 
+/** Speaker: "say the letter". The sound waves pulse while it is talking. */
+export function SpeakerIcon({
+  speaking,
+  className,
+}: IconProps & { speaking: boolean }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <path
+        d="M3 9.2h3.6L11.5 5v14l-4.9-4.2H3Z"
+        fill="#4aa3df"
+        stroke="#1f6fa3"
+        strokeWidth="1.6"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M14.6 9.4a3.6 3.6 0 0 1 0 5.2"
+        fill="none"
+        stroke="#1f6fa3"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        className={speaking ? "animate-wave" : undefined}
+      />
+      <path
+        d="M17.2 6.8a7.3 7.3 0 0 1 0 10.4"
+        fill="none"
+        stroke="#1f6fa3"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        className={
+          speaking ? "animate-wave [animation-delay:0.25s]" : undefined
+        }
+      />
+      <path
+        d="M19.8 4.2a11 11 0 0 1 0 15.6"
+        fill="none"
+        stroke="#1f6fa3"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        className={speaking ? "animate-wave [animation-delay:0.5s]" : undefined}
+      />
+    </svg>
+  );
+}
+
 /** Lightbulb: "help me". Greys out once the hints are spent. */
 export function LightbulbIcon({
   lit,

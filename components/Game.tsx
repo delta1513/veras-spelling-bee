@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useSpeakLetter } from "@/lib/speech";
 import type { Difficulty, Slot } from "@/lib/types";
 import {
   DIFFICULTIES,
@@ -14,7 +15,7 @@ import Keyboard from "./Keyboard";
 import RoundComplete from "./RoundComplete";
 import SuccessOverlay from "./SuccessOverlay";
 import WordDisplay from "./WordDisplay";
-import { HeartIcon, HomeIcon, LightbulbIcon } from "./icons";
+import { HeartIcon, HomeIcon, LightbulbIcon, SpeakerIcon } from "./icons";
 
 /** How many times the lightbulb can be tapped for each word. */
 const MAX_HINTS = 3;
@@ -80,6 +81,16 @@ export default function Game({
     [state.wrongLetters, state.hintedLetters],
   );
   const hintsLeft = MAX_HINTS - state.hintsUsed;
+  const { supported: canSpeak, speaking, speak, stop } = useSpeakLetter();
+  const cursor = cursorIndex(state.slots);
+  const neededLetter = cursor === -1 ? undefined : state.slots[cursor].letter;
+
+  // Stop talking once the letter she was told about is no longer the one needed.
+  useEffect(() => stop, [state.wordIndex, cursor, state.phase, stop]);
+
+  const handleSpeak = useCallback(() => {
+    if (state.phase === "playing" && neededLetter) speak(neededLetter);
+  }, [state.phase, neededLetter, speak]);
 
   const handlePress = useCallback(
     (letter: string) => {
@@ -252,7 +263,8 @@ export default function Game({
             data-testid="word-image"
             className="h-48 w-48 rounded-3xl bg-white object-contain p-2 shadow-sm roomy:h-60 roomy:w-60 spacious:h-44 spacious:w-44"
           />
-          <div className="flex justify-center">
+          {/* Hint on top, speaker underneath: both in reach of one thumb. */}
+          <div className="flex flex-col items-center justify-center gap-3 roomy:gap-4">
             <button
               type="button"
               data-testid="btn-hint"
@@ -279,12 +291,31 @@ export default function Game({
                 ))}
               </span>
             </button>
+            <button
+              type="button"
+              data-testid="btn-speak"
+              data-speaking={speaking ? "true" : "false"}
+              aria-label="say letter"
+              disabled={!canSpeak || state.phase !== "playing"}
+              onClick={handleSpeak}
+              className={`flex h-20 w-16 items-center justify-center rounded-full bg-white shadow-sm active:translate-y-0.5 disabled:opacity-60 roomy:h-28 roomy:w-24 spacious:h-24 ${
+                speaking
+                  ? "animate-talk scale-110 ring-4 ring-[#4aa3df] transition-transform"
+                  : "transition-transform"
+              }`}
+            >
+              <SpeakerIcon
+                speaking={speaking}
+                className="h-10 w-10 roomy:h-16 roomy:w-16"
+              />
+            </button>
           </div>
         </div>
 
         <WordDisplay
           slots={state.slots}
           shake={shake && state.phase === "playing"}
+          speaking={speaking}
         />
       </div>
 

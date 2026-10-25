@@ -76,6 +76,35 @@ button {
   }
 }
 
+/* Speaker sound waves fading in and out, one after another. */
+@keyframes wave {
+  0%,
+  100% {
+    opacity: 0.15;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* A soft ring that grows out of whatever is talking. */
+@keyframes talk {
+  0% {
+    box-shadow: 0 0 0 0 rgb(74 163 223 / 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 18px rgb(74 163 223 / 0);
+  }
+}
+
+.animate-wave {
+  animation: wave 0.75s ease-in-out infinite;
+}
+
+.animate-talk {
+  animation: talk 0.9s ease-out infinite;
+}
+
 .animate-bob {
   animation: bob 0.9s ease-in-out infinite;
 }
@@ -91,7 +120,9 @@ button {
 @media (prefers-reduced-motion: reduce) {
   .animate-bob,
   .animate-shake,
-  .animate-pop {
+  .animate-pop,
+  .animate-wave,
+  .animate-talk {
     animation: none;
   }
 }

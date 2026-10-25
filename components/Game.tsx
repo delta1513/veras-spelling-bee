@@ -332,7 +332,11 @@ export default function Game({
         <FailOverlay onRestart={handleRestart} onHome={onHome} />
       )}
       {state.phase === "roundComplete" && (
-        <RoundComplete onReplay={handleRestart} onHome={onHome} />
+        <RoundComplete
+          difficulty={difficulty}
+          onReplay={handleRestart}
+          onHome={onHome}
+        />
       )}
     </main>
   );

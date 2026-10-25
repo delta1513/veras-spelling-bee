@@ -7,7 +7,7 @@ import { DIFFICULTY_ORDER } from "@/lib/words";
  * Difficulty is communicated by colour and by how many bees are on the button.
  * The words are there for whoever is helping, not for the player.
  */
-const LEVEL_STYLES: Record<Difficulty, { bees: number; className: string }> = {
+export const LEVEL_STYLES: Record<Difficulty, { bees: number; className: string }> = {
   easy: { bees: 1, className: "bg-[#5ec46f] border-[#3f9c50]" },
   medium: { bees: 2, className: "bg-[#ffc83d] border-[#d9a11e]" },
   hard: { bees: 3, className: "bg-[#f28c28] border-[#c96f14]" },

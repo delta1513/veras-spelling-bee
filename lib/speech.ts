@@ -72,8 +72,8 @@ export function useSpeakLetter() {
       synth.cancel();
       window.clearTimeout(fallback.current);
 
-      // Upper case, so "A" is read as the letter rather than the word "a".
-      const next = new SpeechSynthesisUtterance(letter.toUpperCase());
+      // Lower case: some voices read a capital as "capital A".
+      const next = new SpeechSynthesisUtterance(letter.toLowerCase());
       const voice = pickVoice();
       if (voice) {
         next.voice = voice;

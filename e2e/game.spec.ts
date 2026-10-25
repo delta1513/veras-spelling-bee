@@ -571,7 +571,7 @@ test("the speaker says the needed letter in Karen's voice, slowly, and shows it 
       () => (window as unknown as { spoken: unknown[] }).spoken,
     ),
   ).toEqual([
-    { text: word[blank].toUpperCase(), voice: "Karen", rate: 0.5, pitch: 1 },
+    { text: word[blank].toLowerCase(), voice: "Karen", rate: 0.5, pitch: 1 },
   ]);
   await expect(speaker).toHaveAttribute("data-speaking", "true");
   await expect(page.getByTestId(`tile-${blank}`)).toHaveAttribute(

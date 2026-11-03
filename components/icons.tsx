@@ -113,6 +113,22 @@ export function CheckIcon({ className }: IconProps) {
   );
 }
 
+/** Red cross: "that one was wrong". */
+export function CrossIcon({ className }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} aria-hidden="true">
+      <circle cx="12" cy="12" r="10.5" fill="#ffffff" />
+      <path
+        d="m7.8 7.8 8.4 8.4M16.2 7.8l-8.4 8.4"
+        fill="none"
+        stroke="#d64545"
+        strokeWidth="3.2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export function SadFaceIcon({ className }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" className={className} aria-hidden="true">

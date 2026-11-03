@@ -34,6 +34,11 @@ interface State {
   hintsUsed: number;
   lives: number;
   phase: Phase;
+  /** Running totals for the score table shown when the round is won. */
+  score: number;
+  totalHints: number;
+  totalWrong: number;
+  wordsDone: number;
 }
 
 /**
@@ -61,6 +66,10 @@ function startRound(difficulty: Difficulty): State {
     hintsUsed: 0,
     lives: config.lives,
     phase: "playing",
+    score: 0,
+    totalHints: 0,
+    totalWrong: 0,
+    wordsDone: 0,
   };
 }
 
@@ -110,10 +119,16 @@ export default function Game({
           const slots = previous.slots.map((slot, index) =>
             index === cursor ? { ...slot, filled: true } : slot,
           );
+          if (!isWordComplete(slots)) return { ...previous, slots };
+          // A word is worth the lives still held plus the hints still unused,
+          // so finishing on the last life with every hint spent earns 1 point.
           return {
             ...previous,
             slots,
-            phase: isWordComplete(slots) ? "wordComplete" : "playing",
+            phase: "wordComplete",
+            wordsDone: previous.wordsDone + 1,
+            score:
+              previous.score + previous.lives + MAX_HINTS - previous.hintsUsed,
           };
         }
 
@@ -124,6 +139,7 @@ export default function Game({
           ...previous,
           wrongLetters: [...previous.wrongLetters, letter],
           lives,
+          totalWrong: previous.totalWrong + 1,
           phase: lives <= 0 ? "gameOver" : "playing",
         };
       });
@@ -166,6 +182,7 @@ export default function Game({
         ...previous,
         hintedLetters: [...previous.hintedLetters, ...greyed],
         hintsUsed: previous.hintsUsed + 1,
+        totalHints: previous.totalHints + 1,
       };
     });
   }, []);
@@ -334,6 +351,13 @@ export default function Game({
       {state.phase === "roundComplete" && (
         <RoundComplete
           difficulty={difficulty}
+          stats={{
+            hints: state.totalHints,
+            wrong: state.totalWrong,
+            right: state.wordsDone,
+            score: state.score,
+            maxScore: state.words.length * (config.lives + MAX_HINTS),
+          }}
           onReplay={handleRestart}
           onHome={onHome}
         />

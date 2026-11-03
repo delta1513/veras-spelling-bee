@@ -1,7 +1,12 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
-import { DIFFICULTIES, ROUND_SIZE, blankPositions, roundLength } from "../lib/words";
+import {
+  DIFFICULTIES,
+  ROUND_SIZE,
+  blankPositions,
+  roundLength,
+} from "../lib/words";
 import type { Difficulty } from "../lib/types";
 
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
@@ -205,6 +210,112 @@ test("different seeds sample different words from the list", async ({
   }
   // Easy has 18 words and plays 15, so the chosen set varies, not just the order.
   expect(samples.size).toBeGreaterThan(1);
+});
+
+/** Play a round, spending a few hints and wrong letters on the first word only. */
+async function playRoundWithMistakes(page: Page, wrong: number, hints: number) {
+  const word = await currentWord(page);
+  const absent = [...ALPHABET].filter((letter) => !word.includes(letter));
+  // Wrong letters first: a hint could otherwise grey out the key being tapped.
+  for (const letter of absent.slice(0, wrong)) {
+    await page.getByTestId(`key-${letter}`).click();
+  }
+  for (let i = 0; i < hints; i++) await page.getByTestId("btn-hint").click();
+  await solveWord(page);
+  await page.getByTestId("btn-next").click();
+  for (let i = 1; i < ROUND_SIZE; i++) {
+    await solveWord(page);
+    await page.getByTestId("btn-next").click();
+  }
+}
+
+test("a perfect round fills the score bar to 100% and the table shows the counts", async ({
+  page,
+}) => {
+  await start(page, "easy");
+  await playRound(page, "easy");
+
+  const panel = page.getByTestId("score-panel");
+  await expect(panel).toBeVisible();
+  // Each word is worth 5 lives + 3 hints = 8, and a perfect round earns all of it.
+  await expect(panel).toHaveAttribute("data-max-score", String(ROUND_SIZE * 8));
+  await expect(panel).toHaveAttribute("data-score", String(ROUND_SIZE * 8));
+  await expect(panel).toHaveAttribute("data-percent", "100");
+  await expect(page.getByTestId("score-row-hints")).toHaveAttribute(
+    "data-value",
+    "0",
+  );
+  await expect(page.getByTestId("score-row-wrong")).toHaveAttribute(
+    "data-value",
+    "0",
+  );
+  await expect(page.getByTestId("score-row-right")).toHaveAttribute(
+    "data-value",
+    String(ROUND_SIZE),
+  );
+  // The bar animates up from empty rather than appearing full.
+  await expect(page.getByTestId("score-bar-fill")).toHaveAttribute(
+    "data-shown",
+    "100",
+  );
+});
+
+test("spending every hint and all but one life on a word scores just 1 point for it", async ({
+  page,
+}) => {
+  await start(page, "easy");
+  await playRoundWithMistakes(page, 4, 3);
+
+  const panel = page.getByTestId("score-panel");
+  // 14 perfect words (8 each) plus one scraped through (1).
+  const max = ROUND_SIZE * 8;
+  await expect(panel).toHaveAttribute("data-score", String(14 * 8 + 1));
+  await expect(panel).toHaveAttribute(
+    "data-percent",
+    String(Math.round(((14 * 8 + 1) / max) * 100)),
+  );
+  await expect(page.getByTestId("score-row-hints")).toHaveAttribute(
+    "data-value",
+    "3",
+  );
+  await expect(page.getByTestId("score-row-wrong")).toHaveAttribute(
+    "data-value",
+    "4",
+  );
+});
+
+test("a lost round shows no score", async ({ page }) => {
+  await start(page, "expert");
+  const word = await currentWord(page);
+  const absent = [...ALPHABET].filter((letter) => !word.includes(letter));
+  await page.getByTestId(`key-${absent[0]}`).click();
+  await expect(page.getByTestId("overlay-fail")).toBeVisible();
+  await expect(page.getByTestId("score-panel")).toHaveCount(0);
+});
+
+test("the score sits below the trophy in portrait and to its right in landscape", async ({
+  page,
+}) => {
+  await start(page, "easy");
+  await playRound(page, "easy");
+  const panel = page.getByTestId("score-panel");
+  const trophy = page.getByTestId("won-difficulty");
+  await expect(panel).toBeVisible();
+
+  const portrait = {
+    panel: await panel.boundingBox(),
+    trophy: await trophy.boundingBox(),
+  };
+  expect(portrait.panel!.y).toBeGreaterThan(
+    portrait.trophy!.y + portrait.trophy!.height,
+  );
+
+  await page.setViewportSize({ width: 900, height: 500 });
+  const wide = {
+    panel: await panel.boundingBox(),
+    trophy: await trophy.boundingBox(),
+  };
+  expect(wide.panel!.x).toBeGreaterThan(wide.trophy!.x + wide.trophy!.width);
 });
 
 test("the same seed replays the same word order", async ({ page }) => {

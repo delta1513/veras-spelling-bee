@@ -74,6 +74,10 @@ The game has four difficulty levels. The table shows the values.
 
 The word list has one word for each letter of the alphabet. Each round plays a random sample of 15 words from the difficulty's pool (`ROUND_SIZE` in `lib/words.ts`), in random order. A pool smaller than 15 plays in full. The game picks the hidden letters at random each time. Expert always shows the first letter.
 
+## Scoring
+
+Each word scores the lives the player still holds plus the hints still unused when the word is finished. Finishing on the last life with every hint spent earns 1 point. The best possible score is `words in the round × (lives + 3 hints)`. The trophy screen shows a table (hints used, wrong letters, words completed) and a progress bar that animates up to the score as a percentage of that best. It uses icons and numbers only, with no sentences. In portrait it sits below the trophy; in landscape it sits to the right.
+
 Add `?seed=<number>` to the URL to fix the word order. The tests use it.
 
 ## Project layout

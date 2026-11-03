@@ -208,7 +208,7 @@ test("different seeds sample different words from the list", async ({
     const words = await playRound(page, "easy");
     samples.add([...words].sort().join(","));
   }
-  // Easy has 18 words and plays 15, so the chosen set varies, not just the order.
+  // Easy has 28 words and plays 15, so the chosen set varies, not just the order.
   expect(samples.size).toBeGreaterThan(1);
 });
 

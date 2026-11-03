@@ -67,7 +67,7 @@ The game has four difficulty levels. The table shows the values.
 
 | Difficulty | Word pool | Blanks per word | Lives |
 | --- | --- | --- | --- |
-| Easy | 18 | 1 | 5 for each word |
+| Easy | 28 | 1 | 5 for each word |
 | Medium | 10 | `ceil(0.25 × length)` | 4 for each word |
 | Hard | 9 | `ceil(0.5 × length)` | 3 for the round |
 | Expert | 29 | all letters except the first | 1 for the round |

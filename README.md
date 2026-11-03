@@ -25,7 +25,7 @@ host. There are no runtime API calls and no server.
 
 | Difficulty | Word pool | Blanks per word | Lives |
 | --- | --- | --- | --- |
-| Easy | 18 | 1 | 5, refilled each word |
+| Easy | 28 | 1 | 5, refilled each word |
 | Medium | 10 | `ceil(0.25 × length)` | 4, refilled each word |
 | Hard | 9 | `ceil(0.5 × length)` | 3 for the whole round |
 | Expert | 29 | every letter but the first | 1 for the whole round |

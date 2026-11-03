@@ -55,6 +55,16 @@ const EASY_WORDS = [
   "pen",
   "ear",
   "eye",
+  "ant",
+  "axe",
+  "bag",
+  "bat",
+  "box",
+  "fan",
+  "jar",
+  "mop",
+  "owl",
+  "saw",
 ] as const;
 const MEDIUM_WORDS = [
   "ball",

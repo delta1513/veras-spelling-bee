@@ -53,6 +53,16 @@ const PICTOGRAMS = {
   pen: 2282,
   ear: 2871,
   eye: 6573,
+  ant: 2425,
+  axe: 6519,
+  bag: 23849,
+  bat: 2903,
+  box: 5935,
+  fan: 2612,
+  jar: 3322,
+  mop: 2908,
+  owl: 2671,
+  saw: 2799,
 };
 
 const ATTRIBUTION = {

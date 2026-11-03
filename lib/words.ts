@@ -69,7 +69,7 @@ const MEDIUM_WORDS = [
   "frog",
 ] as const;
 
-/** The 16 words not used by easy or medium, in alphabetical order. */
+/** The words not used by easy or medium, in alphabetical order. */
 const SHORT_WORDS = new Set<string>([...EASY_WORDS, ...MEDIUM_WORDS]);
 const HARD_WORDS: readonly string[] = ALL_WORDS.filter(
   (word) => !SHORT_WORDS.has(word),
@@ -146,12 +146,22 @@ function shuffle<T>(items: readonly T[], random: () => number): T[] {
   return result;
 }
 
+/** How many words one round plays, taken at random from the difficulty's list. */
+export const ROUND_SIZE = 15;
+
+/** Words in a round: `ROUND_SIZE`, or the whole list if it is shorter. */
+export function roundLength(difficulty: Difficulty): number {
+  return Math.min(ROUND_SIZE, DIFFICULTIES[difficulty].words.length);
+}
+
 /**
- * The words for one round, shuffled. A fresh order every round keeps the game
- * from becoming a rote sequence she can finish without looking at the pictures.
+ * The words for one round: a random sample of `ROUND_SIZE` from the
+ * difficulty's list, in random order. Both the choice of words and their order
+ * change every round, which keeps the game from becoming a rote sequence she
+ * can finish without looking at the pictures.
  *
- * Passing a `seed` makes the order reproducible, which is what the end-to-end
- * tests use; without one the order is genuinely random.
+ * Passing a `seed` makes the sample and order reproducible, which is what the
+ * end-to-end tests use; without one they are genuinely random.
  */
 export function roundWords(difficulty: Difficulty, seed?: number): string[] {
   const words = DIFFICULTIES[difficulty].words;
@@ -159,7 +169,8 @@ export function roundWords(difficulty: Difficulty, seed?: number): string[] {
     seed === undefined
       ? Math.random
       : seededRandom(hashWord(`${difficulty}:${seed}`));
-  return shuffle(words, random);
+  // A shuffled list's first N items are a uniform random sample of N.
+  return shuffle(words, random).slice(0, roundLength(difficulty));
 }
 
 /**

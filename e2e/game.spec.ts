@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { expect, test, type Page } from "@playwright/test";
-import { DIFFICULTIES, blankPositions } from "../lib/words";
+import { DIFFICULTIES, ROUND_SIZE, blankPositions, roundLength } from "../lib/words";
 import type { Difficulty } from "../lib/types";
 
 const ALPHABET = "abcdefghijklmnopqrstuvwxyz";
@@ -23,7 +23,7 @@ async function playRound(
   difficulty: Difficulty,
 ): Promise<string[]> {
   const seen: string[] = [];
-  const total = DIFFICULTIES[difficulty].words.length;
+  const total = roundLength(difficulty);
 
   for (let i = 0; i < total; i++) {
     seen.push(await currentWord(page));
@@ -186,8 +186,25 @@ test("playing every word correctly wins the round", async ({ page }) => {
   const played = await playRound(page, "easy");
 
   await expect(page.getByTestId("overlay-round-complete")).toBeVisible();
-  // Every word in the difficulty is played exactly once, whatever the order.
-  expect([...played].sort()).toEqual([...DIFFICULTIES.easy.words].sort());
+  // A round is a sample of ROUND_SIZE words from the list, each played once.
+  expect(played).toHaveLength(ROUND_SIZE);
+  expect(new Set(played).size).toBe(ROUND_SIZE);
+  for (const word of played) {
+    expect(DIFFICULTIES.easy.words as readonly string[]).toContain(word);
+  }
+});
+
+test("different seeds sample different words from the list", async ({
+  page,
+}) => {
+  const samples = new Set<string>();
+  for (const seed of [1, 2, 3, 4, 5]) {
+    await start(page, "easy", seed);
+    const words = await playRound(page, "easy");
+    samples.add([...words].sort().join(","));
+  }
+  // Easy has 18 words and plays 15, so the chosen set varies, not just the order.
+  expect(samples.size).toBeGreaterThan(1);
 });
 
 test("the same seed replays the same word order", async ({ page }) => {
@@ -201,8 +218,9 @@ test("the same seed replays the same word order", async ({ page }) => {
 });
 
 test("word order is shuffled between rounds", async ({ page }) => {
-  // Expert has all 26 words, so an unshuffled list would be alphabetical.
-  const alphabetical = [...DIFFICULTIES.expert.words];
+  // Expert draws from all the words, so an unshuffled round would be the first
+  // ROUND_SIZE of the alphabetical list.
+  const alphabetical = [...DIFFICULTIES.expert.words].slice(0, ROUND_SIZE);
   const orders: string[][] = [];
 
   for (const seed of [11, 22, 33]) {
@@ -286,8 +304,8 @@ test("pictograms are served from this host, never from ARASAAC", async ({
 
   await start(page, "expert");
 
-  // Walk every word so every pictogram in the set gets requested.
-  for (let i = 0; i < DIFFICULTIES.expert.words.length; i++) {
+  // Walk every word in the round, checking each pictogram it requests.
+  for (let i = 0; i < roundLength("expert"); i++) {
     const image = page.getByTestId("word-image");
     const src = await image.getAttribute("src");
     expect(src).toBe(`/pictograms/${await currentWord(page)}.png`);

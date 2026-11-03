@@ -23,15 +23,16 @@ host. There are no runtime API calls and no server.
 
 ## How the game works
 
-| Difficulty | Words | Blanks per word | Lives |
+| Difficulty | Word pool | Blanks per word | Lives |
 | --- | --- | --- | --- |
-| Easy | 5 | 1 | 5, refilled each word |
-| Medium | 5 | `ceil(0.25 × length)` | 4, refilled each word |
-| Hard | 16 | `ceil(0.5 × length)` | 3 for the whole round |
-| Expert | 26 | every letter but the first | 1 for the whole round |
+| Easy | 18 | 1 | 5, refilled each word |
+| Medium | 10 | `ceil(0.25 × length)` | 4, refilled each word |
+| Hard | 9 | `ceil(0.5 × length)` | 3 for the whole round |
+| Expert | 29 | every letter but the first | 1 for the whole round |
 
-The word list has one word per letter of the alphabet. Each round shuffles its
-words into a fresh order, and the hidden letters are picked at random every time
+The word list has one word per letter of the alphabet. Each round plays a random
+sample of 15 words from the difficulty's pool (all of it, if the pool is smaller)
+in a fresh order, and the hidden letters are picked at random every time
 a word comes up — so the same word is a different puzzle on each encounter and
 has to be spelled rather than recalled as a shape.
 

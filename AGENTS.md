@@ -65,14 +65,14 @@ The player sees one picture, which shows a word. Most letters of the word are on
 
 The game has four difficulty levels. The table shows the values.
 
-| Difficulty | Words | Blanks per word | Lives |
+| Difficulty | Word pool | Blanks per word | Lives |
 | --- | --- | --- | --- |
 | Easy | 18 | 1 | 5 for each word |
-| Medium | 5 | `ceil(0.25 × length)` | 4 for each word |
-| Hard | 16 | `ceil(0.5 × length)` | 3 for the round |
-| Expert | 26 | all letters except the first | 1 for the round |
+| Medium | 10 | `ceil(0.25 × length)` | 4 for each word |
+| Hard | 9 | `ceil(0.5 × length)` | 3 for the round |
+| Expert | 29 | all letters except the first | 1 for the round |
 
-The word list has one word for each letter of the alphabet. Each round shuffles the words. The game picks the hidden letters at random each time. Expert always shows the first letter.
+The word list has one word for each letter of the alphabet. Each round plays a random sample of 15 words from the difficulty's pool (`ROUND_SIZE` in `lib/words.ts`), in random order. A pool smaller than 15 plays in full. The game picks the hidden letters at random each time. Expert always shows the first letter.
 
 Add `?seed=<number>` to the URL to fix the word order. The tests use it.
 

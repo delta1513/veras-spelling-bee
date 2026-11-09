@@ -55,16 +55,22 @@ export default function ScorePanel({ stats }: { stats: RoundStats }) {
     {
       id: "hints",
       value: stats.hints,
+      sign: "-",
+      color: "text-[color:var(--color-stop)]",
       icon: <LightbulbIcon lit className="h-10 w-10" />,
     },
     {
       id: "wrong",
       value: stats.wrong,
+      sign: "-",
+      color: "text-[color:var(--color-stop)]",
       icon: <CrossIcon className="h-10 w-10" />,
     },
     {
       id: "right",
       value: stats.right,
+      sign: "+",
+      color: "text-[color:var(--color-go)]",
       icon: <CheckIcon className="h-10 w-10" />,
     },
   ];
@@ -88,7 +94,8 @@ export default function ScorePanel({ stats }: { stats: RoundStats }) {
               className="[&>td]:bg-[color:var(--color-hive)] [&>td:first-child]:rounded-l-2xl [&>td:last-child]:rounded-r-2xl"
             >
               <td className="w-16 py-2 pl-4 align-middle">{row.icon}</td>
-              <td className="py-2 pr-5 text-right align-middle text-4xl font-black tabular-nums text-[color:var(--color-ink)]">
+              <td className={`py-2 pr-5 text-right align-middle text-4xl font-black tabular-nums ${row.color}`}>
+                {row.sign}
                 {row.value}
               </td>
             </tr>
